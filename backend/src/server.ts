@@ -1,4 +1,6 @@
-import express, { Request, Response } from "express";
+import dotenv from "dotenv";
+dotenv.config();
+
 import { prisma } from "@/config/prisma.js";
 import app from "@/app.js";
 
