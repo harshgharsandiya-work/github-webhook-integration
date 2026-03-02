@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { processWebhookEvent } from "@/services/webhook.service.js";
+import {
+    processWebhookEvent,
+    getRecentEvents,
+} from "@/services/webhook.service.js";
 
 export const handleGithubWebhook = async (
     req: Request,
@@ -20,6 +23,16 @@ export const handleGithubWebhook = async (
         res.status(202).send("Webhook received and processing");
     } catch (error) {
         console.error("Error processing webhook:", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
+export const fetchEvents = async (req: Request, res: Response) => {
+    try {
+        const events = await getRecentEvents();
+        res.status(200).json(events ?? []);
+    } catch (error) {
+        console.error("Error fetching events:", error);
         res.status(500).send("Internal Server Error");
     }
 };

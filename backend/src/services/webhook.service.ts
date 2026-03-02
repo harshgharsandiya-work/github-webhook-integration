@@ -26,3 +26,10 @@ export const processWebhookEvent = async (
         },
     });
 };
+
+export const getRecentEvents = async (limit: number = 20) => {
+    return await prisma.githubEvent.findMany({
+        orderBy: { receivedAt: "desc" },
+        take: limit,
+    });
+};

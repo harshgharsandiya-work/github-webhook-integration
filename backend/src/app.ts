@@ -19,7 +19,7 @@ app.use(
 
 //routes
 app.get("/", (req: Request, res: Response) => {
-    console.log("Server is running...");
+    res.status(200).send("Server is running...");
 });
 
 app.use("/api/webhooks", webhookRoutes);
