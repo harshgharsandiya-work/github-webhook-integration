@@ -3,6 +3,11 @@ import {
     processWebhookEvent,
     getRecentEvents,
 } from "@/services/webhook.service.js";
+import {
+    addSseClient,
+    broadcastSseEvent,
+    removeSseClient,
+} from "@/services/sse.service.js";
 
 export const handleGithubWebhook = async (
     req: Request,
@@ -18,7 +23,13 @@ export const handleGithubWebhook = async (
             return;
         }
 
-        await processWebhookEvent(githubDeliveryId, githubEvent, payload);
+        const savedEvent = await processWebhookEvent(
+            githubDeliveryId,
+            githubEvent,
+            payload,
+        );
+
+        broadcastSseEvent(savedEvent);
 
         res.status(202).send("Webhook received and processing");
     } catch (error) {
@@ -35,4 +46,20 @@ export const fetchEvents = async (req: Request, res: Response) => {
         console.error("Error fetching events:", error);
         res.status(500).send("Internal Server Error");
     }
+};
+
+//handle sse connenction
+export const streamEvents = (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    //send initial msg to established connection
+    res.write(": connected\n\n");
+
+    addSseClient(res);
+
+    req.on("close", () => {
+        removeSseClient(res);
+    });
 };

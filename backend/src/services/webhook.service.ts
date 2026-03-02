@@ -15,7 +15,7 @@ export const processWebhookEvent = async (
         "repository" in payload ? payload.repository?.name : "unknown_repo";
 
     //save to db
-    await prisma.githubEvent.create({
+    return await prisma.githubEvent.create({
         data: {
             githubId: githubDeliveryId,
             eventType,
